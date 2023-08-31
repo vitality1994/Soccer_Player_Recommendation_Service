@@ -1,1 +1,1 @@
-[DB type cheet sheet](../../Studies/Data%20Engineering/Types_of_Databases.md)
+[DB type cheet sheet](../../Studies/Data_Engineering/Types_of_Databases.md)
