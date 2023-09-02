@@ -31,3 +31,7 @@ Spending time to make the list of target players is also a cost as a business as
     * ex) play videos...
 
 
+
+
+### Plans
+[plan for building Database](./plans/Plan_for_building_DB.md)

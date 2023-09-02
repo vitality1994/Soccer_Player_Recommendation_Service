@@ -1,1 +1,0 @@
-[DB type cheet sheet](../knowledges/Types_of_Databases.md)
