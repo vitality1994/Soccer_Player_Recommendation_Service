@@ -1,4 +1,4 @@
-# import packages
+#%% import packages
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
@@ -8,56 +8,117 @@ import cchardet
 import json
 import ndjson
 
+class TM_scrape:
 
-def scrape_match_details_from_TM(start_year, start_matchweek):
-    
+    def __init__(self, league_main_url, header):
 
+        self.requests_session = requests.Session()
+        self.league_main_url = league_main_url
+        self.header = header
+        self.match_general_info = []
 
-    requests_session = requests.Session()
+    def get_match_urls(self, begin_year, end_year, begin_matchweek_first_year=1, end_matchweek_last_year=None):
 
+        for year in list(range(begin_year, end_year+1)):
 
-    for year in list(range(start_year,2024)):
+            season_name = 'season '+str(year)+'/'+str(year+1)
 
-        season_name = 'season '+str(year)+'/'+str(year+1)
-
-        print('\n\n'+season_name)
-
-
-        if year==start_year:
-
-            start_matchweek_input = start_matchweek-1
-        
-        else:
-
-            start_matchweek_input = 0
+            print('\n\n'+season_name)
 
 
-        for matchweek in list(range(38))[start_matchweek_input:]:
+            if year==begin_year and year!=end_year:
+
+                begin_matchweek = begin_matchweek_first_year-1
+                end_matchweek = None
+
+            elif year!=begin_year and year==end_year:
+                
+                begin_matchweek = None
+                end_matchweek = end_matchweek_last_year
+
+            elif begin_year==end_year:
+
+                begin_matchweek = begin_matchweek_first_year-1
+                end_matchweek = end_matchweek_last_year
+
+            else:
+
+                begin_matchweek = None
+                end_matchweek = None
 
 
-            print('\nmatchweek: '+str(matchweek+1))
-
-            url = f'https://www.transfermarkt.com/laliga/spieltagtabelle/wettbewerb/ES1?saison_id={year}&spieltag={matchweek+1}' #Laliga
-            # url = f"https://www.transfermarkt.com/premier-league/spieltagtabelle/wettbewerb/GB1?saison_id={year}&spieltag={matchweek+1}" #Premier League
-
-            header = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Safari/605.1.15'}
-
-            page = requests_session.get(url, headers=header)
-
-            soup = BeautifulSoup(page.text, features='lxml')
-
-            # create a list of matches during in a matchweek
-            parsed_matches = list(soup.find('div', class_ = 'large-8 columns').find_all('a', title = 'Match report'))
-            list_matches_url = list(map(lambda x: "https://www.transfermarkt.com"+x['href'], parsed_matches))
 
 
-            match_detail_dict = {}
+            for matchweek in list(range(38))[begin_matchweek:end_matchweek]:
+                
+                print(matchweek+1)
+                url_all_matches_in_a_matchweek = self.league_main_url + f'?saison_id={year}&spieltag={matchweek+1}'
+
+                header = self.header
+
+                page = self.requests_session.get(url_all_matches_in_a_matchweek, headers=header)
+
+                soup = BeautifulSoup(page.text, features='lxml')
+
+                # create a list of matches during in a matchweek
+                parsed_matches = list(soup.find('div', class_ = 'large-8 columns').find_all('a', title = 'Match report'))
+                list_matches_url = list(map(lambda x: "https://www.transfermarkt.com"+x['href'], parsed_matches))
+
+                self.match_urls += list_matches_url
+
+    def get_match_general_info(self, begin_year, end_year, begin_matchweek_first_year=1, end_matchweek_last_year=None):
+                
+
+        for year in list(range(begin_year, end_year+1)):
+
+            season_name = 'season '+str(year)+'/'+str(year+1)
+
+            print('\n\n'+season_name)
+
+
+            if year==begin_year and year!=end_year:
+
+                begin_matchweek = begin_matchweek_first_year-1
+                end_matchweek = None
+
+            elif year!=begin_year and year==end_year:
+                
+                begin_matchweek = None
+                end_matchweek = end_matchweek_last_year
+
+            elif begin_year==end_year:
+
+                begin_matchweek = begin_matchweek_first_year-1
+                end_matchweek = end_matchweek_last_year
+
+            else:
+
+                begin_matchweek = None
+                end_matchweek = None
+
+
+
+
+            for matchweek in list(range(38))[begin_matchweek:end_matchweek]:
+                
+                print(matchweek+1)
+                url_all_matches_in_a_matchweek = self.league_main_url + f'?saison_id={year}&spieltag={matchweek+1}'
+
+                header = self.header
+
+                page = self.requests_session.get(url_all_matches_in_a_matchweek, headers=header)
+
+                soup = BeautifulSoup(page.text, features='lxml')
+
+                # create a list of matches during in a matchweek
+                parsed_matches = list(soup.find('div', class_ = 'large-8 columns').find_all('a', title = 'Match report'))
+                list_matches_url = list(map(lambda x: "https://www.transfermarkt.com"+x['href'], parsed_matches))
 
 
             for one_match_url in list_matches_url:
-
+            
                 one_match_url = one_match_url
-                one_match_page = requests_session.get(one_match_url, headers=header)
+                one_match_page = self.requests_session.get(one_match_url, headers=self.header)
                 one_match_soup = BeautifulSoup(one_match_page.text, features='lxml')
 
                 # extract match score
@@ -117,8 +178,6 @@ def scrape_match_details_from_TM(start_year, start_matchweek):
                 else:
                     match_attendance = match_stadium_attendance_referee.find('strong').text.split(': ')[1]
 
-
-                # extract event type & time
 
                 home_events_par = one_match_soup.find('div', class_ = 'sb-leiste-heim')
                 home_events_list = home_events_par.findAll('div', class_ = "sb-leiste-ereignis")
@@ -517,7 +576,7 @@ def scrape_match_details_from_TM(start_year, start_matchweek):
 
                 match_lineup_url = one_match_soup.find('li', id='line-ups').find('a')['href']
 
-                one_match_lineup_page = requests_session.get("https://www.transfermarkt.com"+match_lineup_url, headers=header)
+                one_match_lineup_page = self.requests_session.get("https://www.transfermarkt.com"+match_lineup_url, headers=self.header)
                 one_match_lineup_soup = BeautifulSoup(one_match_lineup_page.text, features='lxml')
                 
 
@@ -525,17 +584,23 @@ def scrape_match_details_from_TM(start_year, start_matchweek):
                 substitutes = one_match_lineup_soup.findAll('div', class_ = 'row sb-formation')[1]
                 managers = one_match_lineup_soup.findAll('div', class_ = 'row sb-formation')[2]
                 
+                if starting_lineups.findAll('div', class_='large-6 columns')[0].find('table', class_='items')!=None:
+                    home_starting_lineups_par = starting_lineups.findAll('div', class_='large-6 columns')[0].find('table', class_='items').findAll('a', class_='wichtig')
+                    home_starting_lineups_list = list(map(lambda x: x.text, home_starting_lineups_par))
 
-                home_starting_lineups_par = starting_lineups.findAll('div', class_='large-6 columns')[0].find('table', class_='items').findAll('a', class_='wichtig')
-                                
+                else:
+                    home_starting_lineups_list = None     
                 
-                home_starting_lineups_list = list(map(lambda x: x.text, home_starting_lineups_par))
                 
                 away_starting_lineups_par = starting_lineups.findAll('div', class_='large-6 columns')[1].find('table', class_='items').findAll('a', class_='wichtig')
                 away_starting_lineups_list = list(map(lambda x: x.text, away_starting_lineups_par))
 
-                home_subplayer_par = substitutes.findAll('div', class_='large-6 columns')[0].find('table', class_='items').findAll('a', class_='wichtig')
-                home_subplayer_list = list(map(lambda x: x.text, home_subplayer_par))
+                if substitutes.findAll('div', class_='large-6 columns')[0].find('table', class_='items')!=None:
+                    home_subplayer_par = substitutes.findAll('div', class_='large-6 columns')[0].find('table', class_='items').findAll('a', class_='wichtig')
+                    home_subplayer_list = list(map(lambda x: x.text, home_subplayer_par))
+                else:
+                    home_subplayer_list = None
+                
                 
                 away_subplayer_par = substitutes.findAll('div', class_='large-6 columns')[1].find('table', class_='items').findAll('a', class_='wichtig')
                 away_subplayer_list = list(map(lambda x: x.text, away_subplayer_par))
@@ -557,10 +622,30 @@ def scrape_match_details_from_TM(start_year, start_matchweek):
                 
 
                 print(match_detail_dict['team_details']['home']['name'], 'vs', match_detail_dict['team_details']['away']['name'])
-                
-                with open('data.json', 'a') as f:
-                    json.dump(match_detail_dict, f)
-                    f.write("\n")
+
+                self.match_general_info.append(match_detail_dict)
+
+    def make_json(self):
 
 
-scrape_match_details_from_TM(start_year=2010, start_matchweek=38)
+        for one_match_record in self.match_general_info:
+
+            with open('data.json', 'a') as f:
+                json.dump(one_match_record, f)
+                f.write("\n")
+
+
+
+# testing
+Laliga_scrape = TM_scrape(
+    league_main_url='https://www.transfermarkt.com/laliga/spieltagtabelle/wettbewerb/ES1',
+    header={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 \
+            (KHTML, like Gecko) Version/16.6 Safari/605.1.15'})
+
+Laliga_scrape.get_match_general_info(
+    begin_year=2010, 
+    end_year=2023,
+    begin_matchweek_first_year=38)
+
+Laliga_scrape.make_json()
+# %%
