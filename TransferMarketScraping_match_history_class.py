@@ -8,6 +8,8 @@ import cchardet
 import json
 import ndjson
 
+#%% define scraper
+
 class TM_scrape:
 
     def __init__(self, league_main_url, header):
@@ -49,7 +51,7 @@ class TM_scrape:
 
 
 
-            for matchweek in list(range(38))[begin_matchweek:end_matchweek]:
+            for matchweek in list(range(40))[begin_matchweek:end_matchweek]:
                 
                 print(matchweek+1)
                 url_all_matches_in_a_matchweek = self.league_main_url + f'?saison_id={year}&spieltag={matchweek+1}'
@@ -87,8 +89,11 @@ class TM_scrape:
                     timestamp_pat = re.compile('[0-9]{1,2}:[0-9]{1,2} [A-Za-z]{2}')
                     match_starttime_parsed = one_match_soup.find('div', class_ = 'box sb-spielbericht-head')
 
-                    match_starttime = timestamp_pat.findall(match_starttime_parsed.text)[0]
+                    try:
+                        match_starttime = timestamp_pat.findall(match_starttime_parsed.text)[0]
 
+                    except:
+                        match_starttime = None
 
                     # extract home teamname & ranking at that time 
                     match_home_name_rank = one_match_soup.find('div', class_='sb-team sb-heim').text.split(' Position:')
@@ -118,7 +123,13 @@ class TM_scrape:
                     match_stadium_referee_list = list(map(lambda x: x.text, match_stadium_referee_parsed))
 
                     match_stadium = match_stadium_referee_list[0]
-                    match_referee = match_stadium_referee_list[1]
+                    
+                    try:
+                        match_referee = match_stadium_referee_list[1]
+
+                    except:
+                        match_referee = None
+
 
 
                     if match_stadium_attendance_referee.find('span', class_='hide-for-small').find('strong')==None:
@@ -541,9 +552,16 @@ class TM_scrape:
                     else:
                         home_starting_lineups_list = None     
                     
-                    
-                    away_starting_lineups_par = starting_lineups.findAll('div', class_='large-6 columns')[1].find('table', class_='items').findAll('a', class_='wichtig')
-                    away_starting_lineups_list = list(map(lambda x: x.text, away_starting_lineups_par))
+                    if starting_lineups.findAll('div', class_='large-6 columns')[1].find('table', class_='items')!=None:
+
+                        away_starting_lineups_par = starting_lineups.findAll('div', class_='large-6 columns')[1].find('table', class_='items').findAll('a', class_='wichtig')
+                        away_starting_lineups_list = list(map(lambda x: x.text, away_starting_lineups_par))
+
+                    else:
+                        away_starting_lineups_list = None
+
+
+
 
                     if substitutes.findAll('div', class_='large-6 columns')[0].find('table', class_='items')!=None:
                         home_subplayer_par = substitutes.findAll('div', class_='large-6 columns')[0].find('table', class_='items').findAll('a', class_='wichtig')
@@ -551,9 +569,12 @@ class TM_scrape:
                     else:
                         home_subplayer_list = None
                     
-                    
-                    away_subplayer_par = substitutes.findAll('div', class_='large-6 columns')[1].find('table', class_='items').findAll('a', class_='wichtig')
-                    away_subplayer_list = list(map(lambda x: x.text, away_subplayer_par))
+                    if substitutes.findAll('div', class_='large-6 columns')[1].find('table', class_='items')!=None:
+                        away_subplayer_par = substitutes.findAll('div', class_='large-6 columns')[1].find('table', class_='items').findAll('a', class_='wichtig')
+                        away_subplayer_list = list(map(lambda x: x.text, away_subplayer_par))
+                    else:
+                        away_subplayer_list = None
+
 
                     home_manager = managers.findAll('div', class_='large-6 columns')[0].find('table', class_='items').findAll('a', class_='wichtig')[0].text
                     away_manager = managers.findAll('div', class_='large-6 columns')[1].find('table', class_='items').findAll('a', class_='wichtig')[0].text
@@ -579,15 +600,25 @@ class TM_scrape:
 
 
 
-# testing
-Laliga_scrape = TM_scrape(
-    league_main_url='https://www.transfermarkt.com/laliga/spieltagtabelle/wettbewerb/ES1',
+# scraping
+scraper = TM_scrape(
+    league_main_url='https://www.transfermarkt.com/serie-a/spieltagtabelle/wettbewerb/IT1',
     header={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 \
             (KHTML, like Gecko) Version/16.6 Safari/605.1.15'})
 
-Laliga_scrape.get_match_general_info(
-    begin_year=2010, 
+scraper.get_match_general_info(
+    begin_year=2012, 
     end_year=2023,
-    begin_matchweek_first_year=38)
+    begin_matchweek_first_year=4)
 
-# %%
+
+# urls
+# Bundesliga: 'https://www.transfermarkt.com/bundesliga/spieltagtabelle/wettbewerb/L1' / fin
+
+# Seria A: 'https://www.transfermarkt.com/serie-a/spieltagtabelle/wettbewerb/IT1' / processing...
+
+# Ligue 1: 'https://www.transfermarkt.com/ligue-1/spieltagtabelle/wettbewerb/FR1'
+# Super lig: 'https://www.transfermarkt.com/super-lig/spieltagtabelle/wettbewerb/TR1'
+# Liga Portugal: 'https://www.transfermarkt.com/liga-nos/spieltagtabelle/wettbewerb/PO1'
+# Eredivisi: 'https://www.transfermarkt.com/eredivisie/spieltagtabelle/wettbewerb/NL1'
+# K-league: 'https://www.transfermarkt.com/k-league-1/spieltagtabelle/wettbewerb/RSK1'
