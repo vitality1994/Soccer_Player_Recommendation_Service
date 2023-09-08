@@ -621,4 +621,3 @@ scraper.get_match_general_info(
 # Super lig: 'https://www.transfermarkt.com/super-lig/spieltagtabelle/wettbewerb/TR1'
 # Liga Portugal: 'https://www.transfermarkt.com/liga-nos/spieltagtabelle/wettbewerb/PO1'
 # Eredivisi: 'https://www.transfermarkt.com/eredivisie/spieltagtabelle/wettbewerb/NL1'
-# K-league: 'https://www.transfermarkt.com/k-league-1/spieltagtabelle/wettbewerb/RSK1'

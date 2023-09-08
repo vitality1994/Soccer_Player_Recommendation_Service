@@ -66,17 +66,33 @@ for league_url, num_matchweeks in league_urls_num_matchweeks.items():
         driver.find_element(By.XPATH, f'//*[@id="seasons"]/option[{year_index}]').click()
 
         #%% for loop: change match week 
-        for i in range(num_matchweeks):
+
+        # match week changes from latest to oldest one (e.g. 38->1)
+        # please change 'starting_point' correctly when you run the code again after failing.
+        starting_point = 38
+
+        if starting_point!=38:
+            for j in range(num_matchweeks-starting_point):
+                time.sleep(1)
+                driver.find_element(By.XPATH, '//*[@id="date-controller"]/a[1]').click()
+
+        for i in range(num_matchweeks)[num_matchweeks-starting_point:]:
             
             print(f'matchweek {num_matchweeks-i}')
             time.sleep(5)
+
             matches_list = driver.find_elements(By.XPATH, f'//*[@id="tournament-fixture"]/div/div')
+            print(list(map(lambda x: x.text, matches_list)))
             #%% for loop: change match
             for match_index in range(len(matches_list)):
-
+                
+                time.sleep(10)
                 one_match = {}
+                print(driver.find_element(By.XPATH, f'//*[@id="tournament-fixture"]/div/div[{match_index+1}]').get_attribute('class'))
                 if driver.find_element(By.XPATH, f'//*[@id="tournament-fixture"]/div/div[{match_index+1}]').get_attribute('class')\
                     != 'col12-lg-12 col12-m-12 col12-s-12 col12-xs-12 divtable-row':
+                   
+                    time.sleep(3)
 
                     driver.find_element(By.XPATH, f'//*[@id="tournament-fixture"]/div/div[{match_index+1}]/div[10]/a').click()
                     driver.find_element(By.XPATH, '//*[@id="layout-wrapper"]/div[3]/div/div[2]/div[2]/h3/a').click()
@@ -180,6 +196,7 @@ for league_url, num_matchweeks in league_urls_num_matchweeks.items():
                     #-----------------------------------------------------------------
                     #%% for loop: to get player offense stats ----------------------------------
                     driver.find_element(By.XPATH, '//*[@id="live-player-home-options"]/li[2]/a').click()
+                    driver.find_element(By.XPATH, '//*[@id="live-player-away-options"]/li[2]/a').click()
 
                     stats_columns = ['Name', 'Position', 'Shots', 'ShotsOT', 'KeyPasses', 'Dribbles', 'Fouled',
                                     'offsides', 'Disp', 'UnsTouches', 'Rating']
@@ -273,6 +290,7 @@ for league_url, num_matchweeks in league_urls_num_matchweeks.items():
                     
                     #%% for loop: to get player defense stats ----------------------------------
                     driver.find_element(By.XPATH, '//*[@id="live-player-home-options"]/li[3]/a').click()
+                    driver.find_element(By.XPATH, '//*[@id="live-player-away-options"]/li[3]/a').click()
 
                     stats_columns = ['Name', 'Position', 'TotalTackles', 'Interceptions', 'Clearances', 'BlockedShots', 'Fouls', 'Rating']
 
@@ -365,6 +383,7 @@ for league_url, num_matchweeks in league_urls_num_matchweeks.items():
 
                     #%% for loop: to get player passing stats ----------------------------------
                     driver.find_element(By.XPATH, '//*[@id="live-player-home-options"]/li[4]/a').click()
+                    driver.find_element(By.XPATH, '//*[@id="live-player-away-options"]/li[4]/a').click()
 
                     stats_columns = ['Name', 'Position', 'KeyPasses', 'Passes', 'PA%', 'Crosses', 'AccCrosses', 'LB', 'AccLB',
                                     'ThB', 'AccThB', 'Rating']
@@ -480,6 +499,8 @@ for league_url, num_matchweeks in league_urls_num_matchweeks.items():
                     merge_2 = merge_dicts(merge_1, home_all_players_defense_stats)
                     home_merge_3 = merge_dicts(merge_2, home_all_players_passing_stats)
 
+
+                    print(away_all_players_summary_stats, away_all_players_offense_stats, away_all_players_defense_stats, away_all_players_passing_stats)
                     merge_1 = merge_dicts(away_all_players_summary_stats, away_all_players_offense_stats)
                     merge_2 = merge_dicts(merge_1, away_all_players_defense_stats)
                     away_merge_3 = merge_dicts(merge_2, away_all_players_passing_stats)    
@@ -492,7 +513,8 @@ for league_url, num_matchweeks in league_urls_num_matchweeks.items():
                     one_match['away_lineup'] = away_merge_3
 
                     #%% save one match sample
-                    with open(f'{league_name}_{2025-year_index}-{2026-year_index}.json', 'a') as f:
+
+                    with open(f'{league_name}_{2025-year_index}-{2026-year_index}_matchweek_{num_matchweeks-i}.json', 'a') as f:
                         json.dump(one_match, f)
                         f.write("\n")
 
@@ -500,12 +522,17 @@ for league_url, num_matchweeks in league_urls_num_matchweeks.items():
                     #%% go back to the page includes match list
                     driver.execute_script("window.history.go(-2)")
 
-                # change matchweek if it is the last match in the week
-                if match_index+1 == len(matches_list):
-                    
-                    for j in range(i+1):
-                        time.sleep(1)
-                        driver.find_element(By.XPATH, '//*[@id="date-controller"]/a[1]').click()
+                    # change matchweek if it is the last match in the week      
+
+                    if match_index == len(matches_list)-1:
+                        for j in range(i+1):
+                            time.sleep(1)
+                            driver.find_element(By.XPATH, '//*[@id="date-controller"]/a[1]').click()
+
+                    else:
+                        for j in range(i):
+                            time.sleep(1)
+                            driver.find_element(By.XPATH, '//*[@id="date-controller"]/a[1]').click()
 
 
 #%%
