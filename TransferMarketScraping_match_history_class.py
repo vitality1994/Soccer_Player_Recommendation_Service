@@ -534,50 +534,58 @@ class TM_scrape:
                     match_detail_dict['event_details']['home'] = home_event_details_dict
                     match_detail_dict['event_details']['away'] = away_event_details_dict
 
+                    try:
+                        match_lineup_url = one_match_soup.find('li', id='line-ups').find('a')['href']
+                        one_match_lineup_page = self.requests_session.get("https://www.transfermarkt.com"+match_lineup_url, headers=self.header)
+                        one_match_lineup_soup = BeautifulSoup(one_match_lineup_page.text, features='lxml')
+                        
 
-                    match_lineup_url = one_match_soup.find('li', id='line-ups').find('a')['href']
+                        starting_lineups = one_match_lineup_soup.findAll('div', class_ = 'row sb-formation')[0]
+                        substitutes = one_match_lineup_soup.findAll('div', class_ = 'row sb-formation')[1]
+                        managers = one_match_lineup_soup.findAll('div', class_ = 'row sb-formation')[2]
+                        
+                        if starting_lineups.findAll('div', class_='large-6 columns')[0].find('table', class_='items')!=None:
+                            home_starting_lineups_par = starting_lineups.findAll('div', class_='large-6 columns')[0].find('table', class_='items').findAll('a', class_='wichtig')
+                            home_starting_lineups_list = list(map(lambda x: x.text, home_starting_lineups_par))
 
-                    one_match_lineup_page = self.requests_session.get("https://www.transfermarkt.com"+match_lineup_url, headers=self.header)
-                    one_match_lineup_soup = BeautifulSoup(one_match_lineup_page.text, features='lxml')
-                    
+                        else:
+                            home_starting_lineups_list = None     
+                        
+                        if starting_lineups.findAll('div', class_='large-6 columns')[1].find('table', class_='items')!=None:
 
-                    starting_lineups = one_match_lineup_soup.findAll('div', class_ = 'row sb-formation')[0]
-                    substitutes = one_match_lineup_soup.findAll('div', class_ = 'row sb-formation')[1]
-                    managers = one_match_lineup_soup.findAll('div', class_ = 'row sb-formation')[2]
-                    
-                    if starting_lineups.findAll('div', class_='large-6 columns')[0].find('table', class_='items')!=None:
-                        home_starting_lineups_par = starting_lineups.findAll('div', class_='large-6 columns')[0].find('table', class_='items').findAll('a', class_='wichtig')
-                        home_starting_lineups_list = list(map(lambda x: x.text, home_starting_lineups_par))
+                            away_starting_lineups_par = starting_lineups.findAll('div', class_='large-6 columns')[1].find('table', class_='items').findAll('a', class_='wichtig')
+                            away_starting_lineups_list = list(map(lambda x: x.text, away_starting_lineups_par))
 
-                    else:
-                        home_starting_lineups_list = None     
-                    
-                    if starting_lineups.findAll('div', class_='large-6 columns')[1].find('table', class_='items')!=None:
-
-                        away_starting_lineups_par = starting_lineups.findAll('div', class_='large-6 columns')[1].find('table', class_='items').findAll('a', class_='wichtig')
-                        away_starting_lineups_list = list(map(lambda x: x.text, away_starting_lineups_par))
-
-                    else:
-                        away_starting_lineups_list = None
-
+                        else:
+                            away_starting_lineups_list = None
 
 
 
-                    if substitutes.findAll('div', class_='large-6 columns')[0].find('table', class_='items')!=None:
-                        home_subplayer_par = substitutes.findAll('div', class_='large-6 columns')[0].find('table', class_='items').findAll('a', class_='wichtig')
-                        home_subplayer_list = list(map(lambda x: x.text, home_subplayer_par))
-                    else:
+
+                        if substitutes.findAll('div', class_='large-6 columns')[0].find('table', class_='items')!=None:
+                            home_subplayer_par = substitutes.findAll('div', class_='large-6 columns')[0].find('table', class_='items').findAll('a', class_='wichtig')
+                            home_subplayer_list = list(map(lambda x: x.text, home_subplayer_par))
+                        else:
+                            home_subplayer_list = None
+                        
+                        if substitutes.findAll('div', class_='large-6 columns')[1].find('table', class_='items')!=None:
+                            away_subplayer_par = substitutes.findAll('div', class_='large-6 columns')[1].find('table', class_='items').findAll('a', class_='wichtig')
+                            away_subplayer_list = list(map(lambda x: x.text, away_subplayer_par))
+                        else:
+                            away_subplayer_list = None
+
+
+                        home_manager = managers.findAll('div', class_='large-6 columns')[0].find('table', class_='items').findAll('a', class_='wichtig')[0].text
+                        away_manager = managers.findAll('div', class_='large-6 columns')[1].find('table', class_='items').findAll('a', class_='wichtig')[0].text
+
+                    except:
+                        home_starting_lineups_list = None
                         home_subplayer_list = None
-                    
-                    if substitutes.findAll('div', class_='large-6 columns')[1].find('table', class_='items')!=None:
-                        away_subplayer_par = substitutes.findAll('div', class_='large-6 columns')[1].find('table', class_='items').findAll('a', class_='wichtig')
-                        away_subplayer_list = list(map(lambda x: x.text, away_subplayer_par))
-                    else:
+                        home_manager = None
+
+                        away_starting_lineups_list = None
                         away_subplayer_list = None
-
-
-                    home_manager = managers.findAll('div', class_='large-6 columns')[0].find('table', class_='items').findAll('a', class_='wichtig')[0].text
-                    away_manager = managers.findAll('div', class_='large-6 columns')[1].find('table', class_='items').findAll('a', class_='wichtig')[0].text
+                        away_manager = None
 
 
                     match_detail_dict['team_details']['home'] = {'name': match_home_name,
@@ -600,24 +608,24 @@ class TM_scrape:
 
 
 
+
 # scraping
 scraper = TM_scrape(
-    league_main_url='https://www.transfermarkt.com/serie-a/spieltagtabelle/wettbewerb/IT1',
+    league_main_url='https://www.transfermarkt.com/eredivisie/spieltagtabelle/wettbewerb/NL1',
     header={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 \
             (KHTML, like Gecko) Version/16.6 Safari/605.1.15'})
 
 scraper.get_match_general_info(
-    begin_year=2012, 
-    end_year=2023,
-    begin_matchweek_first_year=4)
+    begin_year=2010, 
+    end_year=2023)
 
 
 # urls
 # Bundesliga: 'https://www.transfermarkt.com/bundesliga/spieltagtabelle/wettbewerb/L1' / fin
+# Seria A: 'https://www.transfermarkt.com/serie-a/spieltagtabelle/wettbewerb/IT1' / fin
+# Ligue 1: 'https://www.transfermarkt.com/ligue-1/spieltagtabelle/wettbewerb/FR1' / fin
 
-# Seria A: 'https://www.transfermarkt.com/serie-a/spieltagtabelle/wettbewerb/IT1' / processing...
+# Eredivisi: 'https://www.transfermarkt.com/eredivisie/spieltagtabelle/wettbewerb/NL1'
 
-# Ligue 1: 'https://www.transfermarkt.com/ligue-1/spieltagtabelle/wettbewerb/FR1'
 # Super lig: 'https://www.transfermarkt.com/super-lig/spieltagtabelle/wettbewerb/TR1'
 # Liga Portugal: 'https://www.transfermarkt.com/liga-nos/spieltagtabelle/wettbewerb/PO1'
-# Eredivisi: 'https://www.transfermarkt.com/eredivisie/spieltagtabelle/wettbewerb/NL1'

@@ -63,13 +63,14 @@ for league_url, num_matchweeks in league_urls_num_matchweeks.items():
 
         one_season_total = []
 
+        print(driver.find_element(By.XPATH, f'//*[@id="seasons"]/option[{year_index}]').text)
         driver.find_element(By.XPATH, f'//*[@id="seasons"]/option[{year_index}]').click()
 
         #%% for loop: change match week 
 
         # match week changes from latest to oldest one (e.g. 38->1)
         # please change 'starting_point' correctly when you run the code again after failing.
-        starting_point = 38
+        starting_point = 18
 
         if starting_point!=38:
             for j in range(num_matchweeks-starting_point):
@@ -82,13 +83,12 @@ for league_url, num_matchweeks in league_urls_num_matchweeks.items():
             time.sleep(5)
 
             matches_list = driver.find_elements(By.XPATH, f'//*[@id="tournament-fixture"]/div/div')
-            print(list(map(lambda x: x.text, matches_list)))
             #%% for loop: change match
             for match_index in range(len(matches_list)):
                 
                 time.sleep(10)
                 one_match = {}
-                print(driver.find_element(By.XPATH, f'//*[@id="tournament-fixture"]/div/div[{match_index+1}]').get_attribute('class'))
+
                 if driver.find_element(By.XPATH, f'//*[@id="tournament-fixture"]/div/div[{match_index+1}]').get_attribute('class')\
                     != 'col12-lg-12 col12-m-12 col12-s-12 col12-xs-12 divtable-row':
                    
@@ -500,7 +500,6 @@ for league_url, num_matchweeks in league_urls_num_matchweeks.items():
                     home_merge_3 = merge_dicts(merge_2, home_all_players_passing_stats)
 
 
-                    print(away_all_players_summary_stats, away_all_players_offense_stats, away_all_players_defense_stats, away_all_players_passing_stats)
                     merge_1 = merge_dicts(away_all_players_summary_stats, away_all_players_offense_stats)
                     merge_2 = merge_dicts(merge_1, away_all_players_defense_stats)
                     away_merge_3 = merge_dicts(merge_2, away_all_players_passing_stats)    
@@ -514,7 +513,7 @@ for league_url, num_matchweeks in league_urls_num_matchweeks.items():
 
                     #%% save one match sample
 
-                    with open(f'{league_name}_{2025-year_index}-{2026-year_index}_matchweek_{num_matchweeks-i}.json', 'a') as f:
+                    with open(f'{league_name}_{2024-year_index}-{2025-year_index}_matchweek_{num_matchweeks-i}.json', 'a') as f:
                         json.dump(one_match, f)
                         f.write("\n")
 
