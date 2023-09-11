@@ -117,3 +117,5 @@ Spending time to make the list of target players is also a cost as a business as
 ### <center> Plans </center>
 
 [plan for building Database](./plans/Plan_for_building_DB.md)
+- data quality check
+- Run scraping codes using two laptops (use docker)
