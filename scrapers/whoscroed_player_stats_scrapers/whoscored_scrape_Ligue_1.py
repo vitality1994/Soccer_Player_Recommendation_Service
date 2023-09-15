@@ -54,7 +54,10 @@ league_name = driver.find_element(By.XPATH, league_url).text.replace(' ', '_')
 
 print(league_name)
 # cancle pop-up
-driver.find_element(By.XPATH, '/html/body/div[7]/div/div[1]/button').click()
+try:
+    driver.find_element(By.XPATH, '/html/body/div[7]/div/div[1]/button').click()
+except:
+    pass
 
 
 driver.find_element(By.XPATH, league_url).click()
