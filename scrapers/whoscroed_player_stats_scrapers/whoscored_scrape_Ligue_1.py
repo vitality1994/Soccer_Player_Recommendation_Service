@@ -112,6 +112,10 @@ for year_index in list(reversed(range(15)))[int(args.start_year)-2010:-1]: # cha
                 except:
                     driver.find_element(By.XPATH, f'//*[@id="tournament-fixture"]/div/div[{match_index+1}]/div[8]/a').click()
                     driver.find_element(By.XPATH, '//*[@id="sub-sub-navigation"]/ul/li[3]/a').click()
+                else:
+                    # exception for 2015-2016 season 03-Oct-15 match / Nice vs Nantes
+                    driver.find_element(By.XPATH, r'//*[@id="tournament-fixture"]/div/div[7]/div[5]/a')
+                    driver.find_element(By.XPATH, '//*[@id="sub-sub-navigation"]/ul/li[3]/a').click()
 
                 driver.find_element(By.XPATH, '//*[@id="layout-wrapper"]/div[3]/div/div[2]/div[2]/h3/a').click()
 
