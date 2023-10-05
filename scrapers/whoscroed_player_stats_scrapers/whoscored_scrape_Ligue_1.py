@@ -108,13 +108,12 @@ for year_index in list(reversed(range(15)))[int(args.start_year)-2010:-1]: # cha
 
                 try:
                     driver.find_element(By.XPATH, f'//*[@id="tournament-fixture"]/div/div[{match_index+1}]/div[10]/a').click()
-
                 except:
                     driver.find_element(By.XPATH, f'//*[@id="tournament-fixture"]/div/div[{match_index+1}]/div[8]/a').click()
 
                     try:
                         driver.find_element(By.XPATH, '//*[@id="sub-sub-navigation"]/ul/li[3]/a').click()
-                            
+                        driver.find_element(By.XPATH, '//*[@id="layout-wrapper"]/div[3]/div/div[2]/div[2]/h3/a').click()
                     except:
                         
                         
@@ -122,6 +121,7 @@ for year_index in list(reversed(range(15)))[int(args.start_year)-2010:-1]: # cha
 
                         driver.find_element(By.XPATH, r'//*[@id="sub-sub-navigation"]/ul/li[2]/a').click()
 
+                        print(driver.find_element(By.XPATH, r'//*[@id="player-table-statistics-body"]/tr/td').text, 'for following match.')
                         if driver.find_element(By.XPATH, r'//*[@id="player-table-statistics-body"]/tr/td').text == 'There are no results to display':
 
                             match_date = driver.find_element(By.XPATH, '//*[@id="match-header"]/div/div[2]/span[3]/div[3]/dl/dd[2]').text
@@ -141,8 +141,8 @@ for year_index in list(reversed(range(15)))[int(args.start_year)-2010:-1]: # cha
                                 f.write("\n")
 
                         
-                            #%% go back to the page includes match list
-                            driver.execute_script("window.history.go(-2)")
+                            # go back to the page includes match list
+                            driver.execute_script("window.history.go(-4)")
 
                             # change matchweek if it is the last match in the week      
 
@@ -156,7 +156,7 @@ for year_index in list(reversed(range(15)))[int(args.start_year)-2010:-1]: # cha
                                     time.sleep(1)
                                     driver.find_element(By.XPATH, '//*[@id="date-controller"]/a[1]').click()
 
-                            break
+                            continue
 
                 driver.find_element(By.XPATH, '//*[@id="layout-wrapper"]/div[3]/div/div[2]/div[2]/h3/a').click()
 
