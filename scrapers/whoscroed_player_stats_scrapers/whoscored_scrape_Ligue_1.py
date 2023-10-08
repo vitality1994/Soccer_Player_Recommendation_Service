@@ -109,7 +109,47 @@ for year_index in list(reversed(range(15)))[int(args.start_year)-2010:-1]: # cha
                 try:
                     driver.find_element(By.XPATH, f'//*[@id="tournament-fixture"]/div/div[{match_index+1}]/div[10]/a').click()
                 except:
-                    driver.find_element(By.XPATH, f'//*[@id="tournament-fixture"]/div/div[{match_index+1}]/div[8]/a').click()
+                    
+
+                    if driver.find_element(By.XPATH, f'//*[@id="tournament-fixture"]/div/div[{match_index+1}]/div[8]/a').text != "vs":
+                        driver.find_element(By.XPATH, f'//*[@id="tournament-fixture"]/div/div[{match_index+1}]/div[8]/a').click()
+                
+                    else:
+                        
+                        driver.find_element(By.XPATH, f'//*[@id="tournament-fixture"]/div/div[{match_index+1}]/div[8]/a').click()
+                        match_date = driver.find_element(By.XPATH, '//*[@id="match-header"]/div/div[2]/span[3]/div[3]/dl/dd[2]').text
+                        home_name = driver.find_element(By.XPATH, '//*[@id="match-header"]/div/div[1]/span[1]/a').text
+                        away_name = driver.find_element(By.XPATH, '//*[@id="match-header"]/div/div[1]/span[5]/a').text
+
+                        one_match['date'] = match_date
+                        one_match['home_name'] = home_name
+                        one_match['away_name'] = away_name
+                        one_match['home_lineup'] = driver.find_element(By.XPATH, '//*[@id="match-header"]/div/div[2]/span[3]/div[1]/dl/dd/span').text
+                        one_match['away_lineup'] = driver.find_element(By.XPATH, '//*[@id="match-header"]/div/div[2]/span[3]/div[1]/dl/dd/span').text
+                        
+                        print(match_date, home_name, 'vs', away_name)
+
+
+                        with open(f'{league_name}_{2024-year_index}-{2025-year_index}_matchweek_{num_matchweeks-i}.json', 'a') as f:
+                            json.dump(one_match, f)
+                            f.write("\n")
+
+                        # go back to the page includes match list
+                        driver.execute_script("window.history.go(-1)")
+
+                        # change matchweek if it is the last match in the week      
+
+                        if match_index == len(matches_list)-1:
+                            for j in range(i+1):
+                                time.sleep(1)
+                                driver.find_element(By.XPATH, '//*[@id="date-controller"]/a[1]').click()
+
+                        else:
+                            for j in range(i):
+                                time.sleep(1)
+                                driver.find_element(By.XPATH, '//*[@id="date-controller"]/a[1]').click()
+
+                        continue
 
                     try:
                         driver.find_element(By.XPATH, '//*[@id="sub-sub-navigation"]/ul/li[3]/a').click()
