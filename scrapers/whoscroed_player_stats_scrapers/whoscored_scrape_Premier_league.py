@@ -31,7 +31,7 @@ options.add_argument(f"user-agent={customUserAgent}")
 #%% Run web scraping 
 
 website = 'https:/1xbet.whoscored.com'
-path = '/Users/jooyong/Downloads/chromedriver-mac-arm64-3/chromedriver'
+path = '/Users/jooyong/Downloads/chromedriver-mac-arm64/chromedriver'
 
 driver = webdriver.Chrome(path, chrome_options=options)
 driver.implicitly_wait(20)
