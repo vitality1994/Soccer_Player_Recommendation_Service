@@ -67,6 +67,32 @@ is_begin = 1
 
 for year_index in list(reversed(range(15)))[int(args.start_year)-2010:-1]: # change seasons
 
+
+    last_year_num_matchweek = 0
+
+    if year_index==1:
+
+        for i in range(50):
+
+            temp_current_week = driver.find_element(By.XPATH, '/html/body/div[4]/div[3]/div[1]/div[5]/div/div/a[2]/span[1]').text
+
+            time.sleep(1)
+            driver.find_element(By.XPATH, '//*[@id="date-controller"]/a[1]').click()
+
+            last_year_num_matchweek += 1
+
+            new_current_week = driver.find_element(By.XPATH, '/html/body/div[4]/div[3]/div[1]/div[5]/div/div/a[2]/span[1]').text
+
+            if temp_current_week == new_current_week:
+                break
+
+        num_matchweeks = last_year_num_matchweek
+
+        driver.find_element(By.XPATH, league_url).click()
+
+
+
+
     one_season_total = []
 
     print(driver.find_element(By.XPATH, f'//*[@id="seasons"]/option[{year_index}]').text)
@@ -91,7 +117,15 @@ for year_index in list(reversed(range(15)))[int(args.start_year)-2010:-1]: # cha
 
     for i in range(num_matchweeks)[num_matchweeks-starting_point:]:
         
-        print(f'matchweek {num_matchweeks-i}')
+        current_week = driver.find_element(By.XPATH, '/html/body/div[4]/div[3]/div[1]/div[5]/div/div/a[2]/span[1]').text
+
+        if year_index==1 and range(num_matchweeks+1)[num_matchweeks-starting_point:][0]==i:
+            driver.find_element(By.XPATH, '//*[@id="date-controller"]/a[1]').click()
+
+        if year_index!=1:
+            print(f'matchweek {num_matchweeks-i}')
+
+
         time.sleep(5)
 
         matches_list = driver.find_elements(By.XPATH, f'//*[@id="tournament-fixture"]/div/div')
@@ -527,25 +561,44 @@ for year_index in list(reversed(range(15)))[int(args.start_year)-2010:-1]: # cha
 
                 #%% save one match sample
 
-                with open(f'{league_name}_{2024-year_index}-{2025-year_index}_matchweek_{num_matchweeks-i}.json', 'a') as f:
-                    json.dump(one_match, f)
-                    f.write("\n")
+                if year_index==1:
+
+                    with open(f'{league_name}_{2024-year_index}-{2025-year_index}_lastweek{num_matchweeks-i-1}_.json', 'a') as f:
+                        json.dump(one_match, f)
+                        f.write("\n")
+
+                else:
+                    with open(f'{league_name}_{2024-year_index}-{2025-year_index}_matchweek_{num_matchweeks-i}.json', 'a') as f:
+                        json.dump(one_match, f)
+                        f.write("\n")
 
             
                 #%% go back to the page includes match list
-                    driver.execute_script("window.history.go(-2)")
+                driver.execute_script("window.history.go(-2)")
 
-                    # change matchweek if it is the last match in the week      
+                # change matchweek if it is the last match in the week      
 
-                    if match_index == len(matches_list)-1:
-                        for j in range(i+1):
-                            time.sleep(1)
-                            driver.find_element(By.XPATH, '//*[@id="date-controller"]/a[1]').click()
+                if match_index == len(matches_list)-1:
 
-                    else:
-                        for j in range(i):
-                            time.sleep(1)
-                            driver.find_element(By.XPATH, '//*[@id="date-controller"]/a[1]').click()
+                    driver.find_element(By.XPATH, '//*[@id="date-controller"]/a[1]').click()
+
+                    for j in range(i+1):
+                        time.sleep(1)
+                        driver.find_element(By.XPATH, '//*[@id="date-controller"]/a[1]').click()
+
+                    next_week = driver.find_element(By.XPATH, '/html/body/div[4]/div[3]/div[1]/div[5]/div/div/a[2]/span[1]').text
 
 
-#%%
+                else:
+                    
+                    driver.find_element(By.XPATH, '//*[@id="date-controller"]/a[1]').click()
+
+                    for j in range(i):
+                        time.sleep(1)
+                        driver.find_element(By.XPATH, '//*[@id="date-controller"]/a[1]').click()
+
+            
+
+        if current_week == next_week:
+            print('done!')
+            break
