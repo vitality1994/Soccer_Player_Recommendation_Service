@@ -7,6 +7,7 @@ import time
 import json
 from fake_headers import Headers
 import argparse
+from datetime import datetime
 
 import warnings
 warnings.filterwarnings("ignore")
@@ -69,7 +70,7 @@ for year_index in list(reversed(range(15)))[int(args.start_year)-2010:-1]: # cha
 
     last_year_num_matchweek = 0
 
-    if year_index==1:
+    if args.start_year==datetime.today().year:
 
         for i in range(50):
 
@@ -120,10 +121,11 @@ for year_index in list(reversed(range(15)))[int(args.start_year)-2010:-1]: # cha
 
         current_week = driver.find_element(By.XPATH, '/html/body/div[4]/div[3]/div[1]/div[5]/div/div/a[2]/span[1]').text
 
-        if year_index==1 and range(num_matchweeks+1)[num_matchweeks-starting_point:][0]==i:
+        if args.start_year==datetime.today().year and range(num_matchweeks+1)[num_matchweeks-starting_point:][0]==i:
             driver.find_element(By.XPATH, '//*[@id="date-controller"]/a[1]').click()
+            print(f'matchweek {num_matchweeks-i-1}')
 
-        if year_index!=1:
+        else:
             print(f'matchweek {num_matchweeks-i}')
 
         time.sleep(5)
@@ -559,9 +561,9 @@ for year_index in list(reversed(range(15)))[int(args.start_year)-2010:-1]: # cha
 
                 #%% save one match sample
 
-                if year_index==1:
+                if args.start_year==datetime.today().year:
 
-                    with open(f'{league_name}_{2024-year_index}-{2025-year_index}_lastweek{num_matchweeks-i-1}_.json', 'a') as f:
+                    with open(f'{league_name}_{2024-year_index}-{2025-year_index}_matchweek{num_matchweeks-i-1}.json', 'a') as f:
                         json.dump(one_match, f)
                         f.write("\n")
 
@@ -581,7 +583,9 @@ for year_index in list(reversed(range(15)))[int(args.start_year)-2010:-1]: # cha
 
                 if match_index == len(matches_list)-1:
 
-                    driver.find_element(By.XPATH, '//*[@id="date-controller"]/a[1]').click()
+
+                    if args.start_year==datetime.today().year:
+                        driver.find_element(By.XPATH, '//*[@id="date-controller"]/a[1]').click()
 
                     for j in range(i+1):
                         time.sleep(1)
@@ -592,7 +596,8 @@ for year_index in list(reversed(range(15)))[int(args.start_year)-2010:-1]: # cha
 
                 else:
                     
-                    driver.find_element(By.XPATH, '//*[@id="date-controller"]/a[1]').click()
+                    if args.start_year==datetime.today().year
+                        driver.find_element(By.XPATH, '//*[@id="date-controller"]/a[1]').click()
 
                     for j in range(i):
                         time.sleep(1)
