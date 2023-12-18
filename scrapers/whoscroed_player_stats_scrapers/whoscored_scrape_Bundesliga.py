@@ -605,7 +605,7 @@ for year_index in list(reversed(range(15)))[int(args.start_year)-2010:-1]: # cha
 
             
 
-        if current_week == next_week:
+        if current_week == next_week and args.start_year==datetime.today().year:
             print('done!')
             break
 

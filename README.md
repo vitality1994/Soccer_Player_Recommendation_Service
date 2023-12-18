@@ -18,17 +18,17 @@ Spending time to make the list of target players is also a cost as a business as
 </br>
 
 ### <center> Service Details <br>
-- Similar player recommendations
-- Dashboards of a target player & similar players
-    - Players’ details
-    - Players’ historical stats
-    - Players’ historical market values
-    - Players’ play heat maps
-    - Players’ general reputation
-    - Expertises’ evaluations
-- Player analysis
+- similar player recommendations
+- dashboards of a target player & similar players
+    - players’ details
+    - players’ historical stats
+    - players’ historical market values
+    - players’ play heat maps
+    - players’ general reputation
+    - expertises’ evaluations
+- player analysis
     - What analysis do other websites (TransferMarket, Squawka, Whoscored, Premier League Official, etc.) not offer?
-        - Time series analysis of players’ statistics
+        - time series analysis of players’ statistics
             - Why do we care about historical stats more than the most current stats of players?
                 - Players sometimes perform worse after transferring to a different team (or a different league). Analyze historical stats of players to understand what could be the factors.
             - Historical stats are a good reference to check the general trend of players’ performance (per match, against rival teams, seasonal, etc.) 
@@ -52,64 +52,117 @@ Spending time to make the list of target players is also a cost as a business as
 
 #### Dataset descriptions
 
-- Historical match data
-    - Source: Transfer Market
-    - Collecting method: Website data scraping
-    - Data details:
-        - Day of week
-        - Day of the week
-        - Match date
-        - Match start / end time
-        - Number of Attendance
-        - Referee
-        - Stadium
-        - Score
-        - Home / Away team name
-        - Rank (at that time)
-        - Home/Away managers
-        - Home/Away starting lineup
-        - Home/Away Substitutes
-        - Home/Away event name / time
-            - Goal (scorer, assister, goal type / assist type)
-            - Substitution in / out / reason
-            - Card receiver / type / reason
+- historical match data
+    - source: Transfer Market
+    - collecting method: website data scraping
+    - data details:
+        - match general info
+            - day of week
+            - match date
+            - match start / end time
+            - stadium
+            - number of Attendance
+            - referee
+            - score
+        - team details
+            - home team
+                - team name
+                - rank (at the time the match was held)
+                - starting lineup
+                - substitutes
+                - manager
+            - away team
+                - team name
+                - rank (at the time the match was held)
+                - starting lineup
+                - substitutes
+                - manager
+        - event details
+            - home team
+                - goal
+                    - scorer
+                    - goal type
+                    - assister
+                    - assist type
+                    - time
+                - card
+                    - name
+                    - card type
+                    - reason
+                    - time
+                - sub
+                    - subs in (name)
+                    - subs out (name)
+                    - subs out reason
+                    - time
+            - away team
+                - goal
+                    - scorer
+                    - goal type
+                    - assister
+                    - assist type
+                    - time
+                - card
+                    - name
+                    - card type
+                    - reason
+                    - time
+                - sub
+                    - subs in (name)
+                    - subs out (name)
+                    - subs out reason
+                    - time
 
 <br>
 
-- Players' data (1)
-    - Source: Transfer Market / Sofascore
-    - Collecting Method: website data scraping
-    - Data details:
-        - From Transfer Market:
-            - Date of birth
-            - Nationality
-            - Age
-            - Height
-            -  Position (Main / Sub)
-            - Main foot
-            - Current Team
-            - Debut date
-            - Start / End date of current contract
-            - Market Value
-            - Team with the highest probability of transfer / Probability
-            - Injury History
-        - From Sofascore: 
-            - Attribute overview
-            - Strength
-            - Weaknesses
-            - Seasonal heatmap
-            - Seasonal stats (not overlapped with stats from Whoscored.com)
+- players' data (1)
+    - source: Transfer Market / Sofascore
+    - collecting method: website data scraping
+    - data details:
+        - from Transfer Market:
+            - date of birth
+            - nationality
+            - age
+            - height
+            - position (Main / Sub)
+            - main foot
+            - current Team
+            - debut date
+            - start / end date of current contract
+            - market value
+            - team with the highest probability of transfer / probability
+            - injury history
+        - from Sofascore: 
+            - attribute overview
+            - strength
+            - weaknesses
+            - seasonal heatmap
+            - seasonal stats (not overlapped with stats from Whoscored.com)
 
 <br>
 
-- Players' data (2)
-    - Source: Whoscored
-    - Collecting Method: website data scraping
-    - Data details:
-        - Match date
-        - Home/Away team name
-        - Home/Away lineups
-        - Player stats (per game, not overlapped with stats from Sofascore)
+- players' data (2)
+    - source: Whoscored
+    - collecting method: website data scraping
+    - data details:
+        - match date
+        - home team name 
+        - away team name
+        - home lineup
+            - player name
+            - position
+            - match stat 1
+            - match stat 2 
+            - ... <br>
+            *for all starting lineups + subs
+        - away lineup
+            - player name
+            - position
+            - match stat 1
+            - match stat 2 
+            - ... <br>
+            *for all starting lineups + subs
+
 
 
 <br><br>
