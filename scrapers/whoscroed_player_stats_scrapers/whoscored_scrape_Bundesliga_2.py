@@ -78,10 +78,10 @@ is_begin = 1 # first loop with defined year
 for year_index in list(reversed(range(15)))[int(args.start_year)-2010:-1]: # change seasons
 
 
-    # temperary codes to make the code stop when it reaches to the current year season------------
-    if driver.find_element(By.XPATH, f'//*[@id="seasons"]/option[{year_index}]').text.split('/')[0] == str(datetime.today().year):
-        break
-    # --------------------------------------------------------------------------------------------
+    # # temperary codes to make the code stop when it reaches to the current year season------------
+    # if driver.find_element(By.XPATH, f'//*[@id="seasons"]/option[{year_index}]').text.split('/')[0] == str(datetime.today().year):
+    #     break
+    # # --------------------------------------------------------------------------------------------
 
 
     # print the season (ex. 2023/2024)
@@ -105,10 +105,15 @@ for year_index in list(reversed(range(15)))[int(args.start_year)-2010:-1]: # cha
         if temp_current_week == new_current_week:
             break
 
+        
+
     # ----------------------------------------------------------------------------------------
 
     # assign the number of matchweeks after counting    
     num_matchweeks = last_year_num_matchweek
+
+    # if args.start_year==str(datetime.today().year):
+    #     num_matchweeks = last_year_num_matchweek+1
 
     # go back to the target starting year
     driver.find_element(By.XPATH, league_url).click()
@@ -138,9 +143,9 @@ for year_index in list(reversed(range(15)))[int(args.start_year)-2010:-1]: # cha
 
 
         # If year is the current year, scraper will start from the right before current matchweek.
-        if args.start_year==datetime.today().year and range(num_matchweeks+1)[num_matchweeks-starting_point:][0]==i:
+        if is_begin==1 and args.start_year==str(datetime.today().year):
             driver.find_element(By.XPATH, '//*[@id="date-controller"]/a[1]').click()
-            print(f'matchweek {num_matchweeks-i-1}')
+            print(f'matchweek {num_matchweeks-i}')
 
         else:
             print(f'matchweek {num_matchweeks-i}')
@@ -584,9 +589,9 @@ for year_index in list(reversed(range(15)))[int(args.start_year)-2010:-1]: # cha
                 #%% save one match sample
 
                 # for the current year 
-                if args.start_year==datetime.today().year:
+                if args.start_year==str(datetime.today().year):
 
-                    with open(f'{league_name}_{2024-year_index}-{2025-year_index}_lastweek{num_matchweeks-i-1}_.json', 'a') as f:
+                    with open(f'{league_name}_{2024-year_index}-{2025-year_index}_matchweek_{num_matchweeks-i}.json', 'a') as f:
                         json.dump(one_match, f)
                         f.write("\n")
                 
@@ -603,9 +608,9 @@ for year_index in list(reversed(range(15)))[int(args.start_year)-2010:-1]: # cha
                 # change matchweek if it is the last match in the week
                 if match_index == len(matches_list)-1:
 
-                    if args.start_year==datetime.today().year:
+                    # if args.start_year==str(datetime.today().year):
 
-                        driver.find_element(By.XPATH, '//*[@id="date-controller"]/a[1]').click()
+                    #     driver.find_element(By.XPATH, '//*[@id="date-controller"]/a[1]').click()
 
                     for j in range(i+1):
                         time.sleep(1)
@@ -616,9 +621,9 @@ for year_index in list(reversed(range(15)))[int(args.start_year)-2010:-1]: # cha
 
                 else:
                     
-                    if args.start_year==datetime.today().year:
+                    # if args.start_year==str(datetime.today().year):
 
-                        driver.find_element(By.XPATH, '//*[@id="date-controller"]/a[1]').click()
+                    #     driver.find_element(By.XPATH, '//*[@id="date-controller"]/a[1]').click()
 
                     for j in range(i):
                         time.sleep(1)
@@ -626,6 +631,6 @@ for year_index in list(reversed(range(15)))[int(args.start_year)-2010:-1]: # cha
 
             
 
-        if current_week == next_week and args.start_year==datetime.today().year:
+        if current_week == next_week and args.start_year==str(datetime.today().year):
             print('done!')
             break

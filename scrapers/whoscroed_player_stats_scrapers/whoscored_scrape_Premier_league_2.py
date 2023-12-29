@@ -40,16 +40,16 @@ driver.get(website)
 
 
 #league urls
-league_urls_num_matchweeks = {'//*[@id="popular-tournaments-list"]/li[1]/a': 38} 
+league_urls_last_year_num_matchweek = {'//*[@id="popular-tournaments-list"]/li[1]/a': 38} 
 
-league_url = list(league_urls_num_matchweeks.keys())[0]
-num_matchweeks = list(league_urls_num_matchweeks.values())[0]
+league_url = list(league_urls_last_year_num_matchweek.keys())[0]
+last_year_num_matchweek = list(league_urls_last_year_num_matchweek.values())[0]
 
 
 # arguments setting -----------------------------------------------------------
 parser = argparse.ArgumentParser()
 parser.add_argument('--start_year', required=True)
-parser.add_argument('--start_matchweek', required=False, default=num_matchweeks)
+parser.add_argument('--start_matchweek', required=False, default=None)
 args = parser.parse_args()
 # -----------------------------------------------------------------------------
 
@@ -78,10 +78,10 @@ is_begin = 1 # first loop with defined year
 for year_index in list(reversed(range(15)))[int(args.start_year)-2010:-1]: # change seasons
 
 
-    # temperary codes to make the code stop when it reaches to the current year season------------
-    if driver.find_element(By.XPATH, f'//*[@id="seasons"]/option[{year_index}]').text.split('/')[0] == str(datetime.today().year):
-        break
-    # --------------------------------------------------------------------------------------------
+    # # temperary codes to make the code stop when it reaches to the current year season------------
+    # if driver.find_element(By.XPATH, f'//*[@id="seasons"]/option[{year_index}]').text.split('/')[0] == str(datetime.today().year):
+    #     break
+    # # --------------------------------------------------------------------------------------------
 
 
     # print the season (ex. 2023/2024)
@@ -98,17 +98,24 @@ for year_index in list(reversed(range(15)))[int(args.start_year)-2010:-1]: # cha
         time.sleep(1)
         driver.find_element(By.XPATH, '//*[@id="date-controller"]/a[1]').click()
 
-        last_year_num_matchweek += 1
 
+    
         new_current_week = driver.find_element(By.XPATH, '/html/body/div[4]/div[3]/div[1]/div[5]/div/div/a[2]/span[1]').text
 
         if temp_current_week == new_current_week:
             break
 
+        last_year_num_matchweek += 1
+
+
+        
     # ----------------------------------------------------------------------------------------
 
     # assign the number of matchweeks after counting    
-    num_matchweeks = last_year_num_matchweek
+    last_year_num_matchweek = last_year_num_matchweek
+
+    # if args.start_year==str(datetime.today().year):
+    #     last_year_num_matchweek = last_year_num_matchweek+1
 
     # go back to the target starting year
     driver.find_element(By.XPATH, league_url).click()
@@ -116,34 +123,38 @@ for year_index in list(reversed(range(15)))[int(args.start_year)-2010:-1]: # cha
 
 
     # set starting point of the matchweek
-    if is_begin == 1:
+    if is_begin == 1 and args.start_matchweek!=None:
         starting_point = int(args.start_matchweek)
 
     else:
-        starting_point = num_matchweeks
+        starting_point = last_year_num_matchweek
 
-    if starting_point!=num_matchweeks:
-        for j in range(num_matchweeks-starting_point):
+    if starting_point!=last_year_num_matchweek:
+        for j in range(last_year_num_matchweek-starting_point):
             time.sleep(1)
             driver.find_element(By.XPATH, '//*[@id="date-controller"]/a[1]').click()
+    
+    elif args.start_matchweek==None:
+        driver.find_element(By.XPATH, '//*[@id="date-controller"]/a[1]').click()
 
     is_begin = 0
 
 
     # get infornation about the current matchweek (ex. how many matches over there?)
-    for i in range(num_matchweeks)[num_matchweeks-starting_point:]:
+    for i in range(last_year_num_matchweek)[last_year_num_matchweek-starting_point:]:
 
         # save current week to finish for loop automatically if there is no change on matchweeks.
         current_week = driver.find_element(By.XPATH, '/html/body/div[4]/div[3]/div[1]/div[5]/div/div/a[2]/span[1]').text
 
 
         # If year is the current year, scraper will start from the right before current matchweek.
-        if args.start_year==datetime.today().year and range(num_matchweeks+1)[num_matchweeks-starting_point:][0]==i:
+        if is_begin == 1 and args.start_year==str(datetime.today().year):
             driver.find_element(By.XPATH, '//*[@id="date-controller"]/a[1]').click()
-            print(f'matchweek {num_matchweeks-i-1}')
+            print(f'matchweek {last_year_num_matchweek-i}')
 
         else:
-            print(f'matchweek {num_matchweeks-i}')
+            print(f'matchweek {last_year_num_matchweek-i}')
+
 
         time.sleep(5)
 
@@ -162,7 +173,13 @@ for year_index in list(reversed(range(15)))[int(args.start_year)-2010:-1]: # cha
 
                 time.sleep(5)
 
-                driver.find_element(By.XPATH, f'//*[@id="tournament-fixture"]/div/div[{match_index+1}]/div[10]/a').click()
+                try:
+                    driver.find_element(By.XPATH, f'//*[@id="tournament-fixture"]/div/div[{match_index+1}]/div[10]/a').click()
+                except:
+                    # when the match is postponed, then we can pass it because it will be held in future matchweek.
+                    if driver.find_element(By.XPATH, f'/html/body/div[4]/div[3]/div[1]/div[7]/div/div/div[{match_index+1}]/div[4]/span').text == 'Post':
+                        continue
+
                 driver.find_element(By.XPATH, '//*[@id="layout-wrapper"]/div[3]/div/div[2]/div[2]/h3/a').click()
 
                 match_date = driver.find_element(By.XPATH, '//*[@id="match-header"]/div/div[2]/span[3]/div[3]/dl/dd[2]').text
@@ -584,15 +601,15 @@ for year_index in list(reversed(range(15)))[int(args.start_year)-2010:-1]: # cha
                 #%% save one match sample
 
                 # for the current year 
-                if args.start_year==datetime.today().year:
+                if args.start_year==str(datetime.today().year):
 
-                    with open(f'{league_name}_{2024-year_index}-{2025-year_index}_lastweek{num_matchweeks-i-1}_.json', 'a') as f:
+                    with open(f'{league_name}_{2024-year_index}-{2025-year_index}_matchweek_{last_year_num_matchweek-i}.json', 'a') as f:
                         json.dump(one_match, f)
                         f.write("\n")
                 
                 # for past years
                 else:
-                    with open(f'{league_name}_{2024-year_index}-{2025-year_index}_matchweek_{num_matchweeks-i}.json', 'a') as f:
+                    with open(f'{league_name}_{2024-year_index}-{2025-year_index}_matchweek_{last_year_num_matchweek-i}.json', 'a') as f:
                         json.dump(one_match, f)
                         f.write("\n")
 
@@ -603,8 +620,7 @@ for year_index in list(reversed(range(15)))[int(args.start_year)-2010:-1]: # cha
                 # change matchweek if it is the last match in the week
                 if match_index == len(matches_list)-1:
 
-                    if args.start_year==datetime.today().year:
-
+                    if args.start_matchweek==None:
                         driver.find_element(By.XPATH, '//*[@id="date-controller"]/a[1]').click()
 
                     for j in range(i+1):
@@ -616,8 +632,7 @@ for year_index in list(reversed(range(15)))[int(args.start_year)-2010:-1]: # cha
 
                 else:
                     
-                    if args.start_year==datetime.today().year:
-
+                    if args.start_matchweek==None:
                         driver.find_element(By.XPATH, '//*[@id="date-controller"]/a[1]').click()
 
                     for j in range(i):
@@ -626,6 +641,6 @@ for year_index in list(reversed(range(15)))[int(args.start_year)-2010:-1]: # cha
 
             
 
-        if current_week == next_week and args.start_year==datetime.today().year:
+        if current_week == next_week and args.start_year==str(datetime.today().year):
             print('done!')
             break

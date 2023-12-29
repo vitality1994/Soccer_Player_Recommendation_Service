@@ -141,7 +141,7 @@ Spending time to make the list of target players is also a cost as a business as
 
 <br>
 
-- players' data (2)
+- players' data - match stats
     - source: Whoscored
     - collecting method: website data scraping
     - data details:
