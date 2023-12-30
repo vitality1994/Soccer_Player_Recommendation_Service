@@ -42,11 +42,11 @@ Spending time to make the list of target players is also a cost as a business as
 2. Laliga (Spain)
 3. Seria-A (Italy)
 4. Bundesliga (Germany)
-5. Eredivisi (Netherlands)
+5. ~~Eredivisi (Netherlands)~~
 6. Ligue 1 (France)
-7. Liga Portugal (Portugal)
-8. Jupiler Pro League (Belgium)
-9. Super Lig (Türkiye)
+7. ~~Liga Portugal (Portugal)~~
+8. ~~Jupiler Pro League (Belgium)~~
+9. ~~Super Lig (Türkiye)~~
 
 <br>
 
@@ -170,5 +170,9 @@ Spending time to make the list of target players is also a cost as a business as
 ### <center> Plans </center>
 
 [plan for building Database](./plans/Plan_for_building_DB.md)
-- data quality check
-- Run scraping codes using two laptops (use docker)
+
+collecting data
+
+build database
+
+![image](Soccer%20Player%20Recommender.png)
