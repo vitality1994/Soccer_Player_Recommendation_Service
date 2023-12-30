@@ -40,10 +40,10 @@ driver.get(website)
 
 
 #league urls
-league_urls_last_year_num_matchweek = {'//*[@id="popular-tournaments-list"]/li[1]/a': 38} 
+league_urls_num_matchweeks = {'//*[@id="popular-tournaments-list"]/li[1]/a': 38} 
 
-league_url = list(league_urls_last_year_num_matchweek.keys())[0]
-last_year_num_matchweek = list(league_urls_last_year_num_matchweek.values())[0]
+league_url = list(league_urls_num_matchweeks.keys())[0]
+num_matchweeks = list(league_urls_num_matchweeks.values())[0]
 
 
 # arguments setting -----------------------------------------------------------
@@ -89,7 +89,10 @@ for year_index in list(reversed(range(15)))[int(args.start_year)-2010:-1]: # cha
     driver.find_element(By.XPATH, f'//*[@id="seasons"]/option[{year_index}]').click()
 
     # Counting the number of match weeks in a given season before the current match week.----
-    last_year_num_matchweek = 0
+    num_matchweeks = 1
+
+    if args.start_matchweek == None:
+        num_matchweeks = 0
 
     for i in range(50):
 
@@ -105,17 +108,17 @@ for year_index in list(reversed(range(15)))[int(args.start_year)-2010:-1]: # cha
         if temp_current_week == new_current_week:
             break
 
-        last_year_num_matchweek += 1
+        num_matchweeks += 1
 
 
         
     # ----------------------------------------------------------------------------------------
 
     # assign the number of matchweeks after counting    
-    last_year_num_matchweek = last_year_num_matchweek
+    num_matchweeks = num_matchweeks
 
     # if args.start_year==str(datetime.today().year):
-    #     last_year_num_matchweek = last_year_num_matchweek+1
+    #     num_matchweeks = num_matchweeks+1
 
     # go back to the target starting year
     driver.find_element(By.XPATH, league_url).click()
@@ -123,25 +126,28 @@ for year_index in list(reversed(range(15)))[int(args.start_year)-2010:-1]: # cha
 
 
     # set starting point of the matchweek
+
     if is_begin == 1 and args.start_matchweek!=None:
         starting_point = int(args.start_matchweek)
 
     else:
-        starting_point = last_year_num_matchweek
+        starting_point = num_matchweeks
+        
 
-    if starting_point!=last_year_num_matchweek:
-        for j in range(last_year_num_matchweek-starting_point):
+    if starting_point!=num_matchweeks:
+        for j in range(num_matchweeks-starting_point):
             time.sleep(1)
             driver.find_element(By.XPATH, '//*[@id="date-controller"]/a[1]').click()
     
-    elif args.start_matchweek==None:
-        driver.find_element(By.XPATH, '//*[@id="date-controller"]/a[1]').click()
+    elif args.start_matchweek == None:
+            time.sleep(1)
+            driver.find_element(By.XPATH, '//*[@id="date-controller"]/a[1]').click()
 
     is_begin = 0
 
 
     # get infornation about the current matchweek (ex. how many matches over there?)
-    for i in range(last_year_num_matchweek)[last_year_num_matchweek-starting_point:]:
+    for i in range(num_matchweeks)[num_matchweeks-starting_point:]:
 
         # save current week to finish for loop automatically if there is no change on matchweeks.
         current_week = driver.find_element(By.XPATH, '/html/body/div[4]/div[3]/div[1]/div[5]/div/div/a[2]/span[1]').text
@@ -150,10 +156,10 @@ for year_index in list(reversed(range(15)))[int(args.start_year)-2010:-1]: # cha
         # If year is the current year, scraper will start from the right before current matchweek.
         if is_begin == 1 and args.start_year==str(datetime.today().year):
             driver.find_element(By.XPATH, '//*[@id="date-controller"]/a[1]').click()
-            print(f'matchweek {last_year_num_matchweek-i}')
+            print(f'matchweek {num_matchweeks-i}')
 
         else:
-            print(f'matchweek {last_year_num_matchweek-i}')
+            print(f'matchweek {num_matchweeks-i}')
 
 
         time.sleep(5)
@@ -603,13 +609,13 @@ for year_index in list(reversed(range(15)))[int(args.start_year)-2010:-1]: # cha
                 # for the current year 
                 if args.start_year==str(datetime.today().year):
 
-                    with open(f'{league_name}_{2024-year_index}-{2025-year_index}_matchweek_{last_year_num_matchweek-i}.json', 'a') as f:
+                    with open(f'{league_name}_{2024-year_index}-{2025-year_index}_matchweek_{num_matchweeks-i}.json', 'a') as f:
                         json.dump(one_match, f)
                         f.write("\n")
                 
                 # for past years
                 else:
-                    with open(f'{league_name}_{2024-year_index}-{2025-year_index}_matchweek_{last_year_num_matchweek-i}.json', 'a') as f:
+                    with open(f'{league_name}_{2024-year_index}-{2025-year_index}_matchweek_{num_matchweeks-i}.json', 'a') as f:
                         json.dump(one_match, f)
                         f.write("\n")
 

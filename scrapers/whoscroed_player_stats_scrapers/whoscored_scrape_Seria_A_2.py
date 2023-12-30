@@ -49,7 +49,7 @@ num_matchweeks = list(league_urls_num_matchweeks.values())[0]
 # arguments setting -----------------------------------------------------------
 parser = argparse.ArgumentParser()
 parser.add_argument('--start_year', required=True)
-parser.add_argument('--start_matchweek', required=False, default=num_matchweeks)
+parser.add_argument('--start_matchweek', required=False, default=None)
 args = parser.parse_args()
 # -----------------------------------------------------------------------------
 
@@ -93,8 +93,11 @@ for year_index in list(reversed(range(15)))[int(args.start_year)-2010:-1]: # cha
     except:
         pass
 
+    num_matchweeks = 1
     # Counting the number of match weeks in a given season before the current match week.----
-    last_year_num_matchweek = 0
+    
+    if args.start_matchweek == None:
+        num_matchweeks = 0
 
     for i in range(50):
 
@@ -103,20 +106,21 @@ for year_index in list(reversed(range(15)))[int(args.start_year)-2010:-1]: # cha
         time.sleep(1)
         driver.find_element(By.XPATH, '//*[@id="date-controller"]/a[1]').click()
 
-        last_year_num_matchweek += 1
+        
 
         new_current_week = driver.find_element(By.XPATH, '/html/body/div[4]/div[3]/div[1]/div[5]/div/div/a[2]/span[1]').text
 
         if temp_current_week == new_current_week:
             break
-
+        
+        num_matchweeks += 1
     # ----------------------------------------------------------------------------------------
 
     # assign the number of matchweeks after counting    
-    num_matchweeks = last_year_num_matchweek
+    num_matchweeks = num_matchweeks
 
     # if args.start_year==str(datetime.today().year):
-    #     num_matchweeks = last_year_num_matchweek+1
+    #     num_matchweeks = num_matchweeks+1
 
     # go back to the target starting year
     driver.find_element(By.XPATH, league_url).click()
@@ -128,7 +132,7 @@ for year_index in list(reversed(range(15)))[int(args.start_year)-2010:-1]: # cha
         pass
 
     # set starting point of the matchweek
-    if is_begin == 1:
+    if is_begin == 1 and args.start_matchweek!=None:
         starting_point = int(args.start_matchweek)
 
     else:
@@ -138,6 +142,10 @@ for year_index in list(reversed(range(15)))[int(args.start_year)-2010:-1]: # cha
         for j in range(num_matchweeks-starting_point):
             time.sleep(1)
             driver.find_element(By.XPATH, '//*[@id="date-controller"]/a[1]').click()
+
+    elif args.start_matchweek==None:
+        time.sleep(1)
+        driver.find_element(By.XPATH, '//*[@id="date-controller"]/a[1]').click()
 
     is_begin = 0
 
@@ -183,7 +191,7 @@ for year_index in list(reversed(range(15)))[int(args.start_year)-2010:-1]: # cha
 
                 print(match_date, home_name, 'vs', away_name)
 
-
+                
                 #%% for loop: to get player stat summary ----------------------------------
                 stats_columns = ['Name', 'Position', 'Shots', 'ShotsOT', 'KeyPasses',
                                 'PA%', 'AerialsWon', 'Touches', 'Rating']
@@ -619,6 +627,9 @@ for year_index in list(reversed(range(15)))[int(args.start_year)-2010:-1]: # cha
 
                     #     driver.find_element(By.XPATH, '//*[@id="date-controller"]/a[1]').click()
 
+                    if args.start_matchweek==None:
+                        driver.find_element(By.XPATH, '//*[@id="date-controller"]/a[1]').click()
+
                     for j in range(i+1):
                         time.sleep(1)
                         driver.find_element(By.XPATH, '//*[@id="date-controller"]/a[1]').click()
@@ -628,9 +639,8 @@ for year_index in list(reversed(range(15)))[int(args.start_year)-2010:-1]: # cha
 
                 else:
                     
-                    # if args.start_year==str(datetime.today().year):
-
-                    #     driver.find_element(By.XPATH, '//*[@id="date-controller"]/a[1]').click()
+                    if args.start_matchweek==None:
+                        driver.find_element(By.XPATH, '//*[@id="date-controller"]/a[1]').click()
 
                     for j in range(i):
                         time.sleep(1)
