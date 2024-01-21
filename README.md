@@ -2,7 +2,7 @@
 
 ## Project Summaries
 
-### <center> Why a data-driven player recommendation service is necessary?</center>
+### Why a data-driven player recommendation service is necessary?
 - Nowadays, soccer players' market value contains a serious market bubble for many different reasons: inflow of oil money from the Mideast, high demand for specific players, and some special rules each league has differently, such as home-grown Quota.
 - There is a specific period that teams can sign new players: the Summer and Winter transfer market. Therefore, if the target player has already signed with another team, starting negotiations with other players on the list of similar players to the previous target player is crucial.
 - There are many leagues in the world, and each league contains many teams, and each team contains many players. 
@@ -11,13 +11,13 @@ Spending time to make the list of target players is also a cost as a business as
 
 </br>
 
-### <center> What are the benefits of this service? </center>
+### What are the benefits of this service? 
 - A recommendation system of similar players to the target players is to be ready if the negotiation breaks down.
 - The dashboard can support domain experts (player scouters) to help them build a better transfer market strategy.
 
 </br>
 
-### <center> What services are provided by this project? <br>
+### What services are provided by this project? <br>
 - similar player recommendations
 - dashboards of a target player & similar players
     - players’ details
@@ -31,28 +31,25 @@ Spending time to make the list of target players is also a cost as a business as
         - time series analysis of players’ statistics <br>
             - Historical stats are a good reference to check the general trend of players’ performance.
 
-<br><br>
+<br>
 
-### <center> What data is used? </center> <br>
+### What similarity method is used?
+- cosine similarity
 
-leagues currently included in the dataset:
+<br>
+
+### What data is used?  <br>
+
+#### leagues currently included in the dataset:
 - Premier League (England)
 - Laliga (Spain)
 - Seria-A (Italy)
 - Bundesliga (Germany)
 - Ligue 1 (France)
 
-leagues could be added in the future:
-- Eredivisi (Netherlands)
-- Liga Portugal (Portugal)
-- Jupiler Pro League (Belgium)
-- Super Lig (Türkiye)
-
-<br>
-
 #### Dataset Descriptions
 
-- historical match <mark>(collected)</mark>
+- historical match (collected)
     - source: Transfer Market
     - collecting method: website data scraping
     - data details:
@@ -115,7 +112,7 @@ leagues could be added in the future:
 
 <br>
 
-- players' data - match stats <mark>(collected)</mark>
+- players' data - match stats (collected)
     - source: Whoscored
     - collecting method: website data scraping
     - data details:
@@ -139,7 +136,7 @@ leagues could be added in the future:
 
 <br>
 
-- players' data - players' info <mark>(not collected yet)</mark>
+- players' data - players' info (not collected yet)
     - source: Transfer Market / Sofascore
     - collecting method: website data scraping
     - data details:
