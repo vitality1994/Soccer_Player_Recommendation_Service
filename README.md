@@ -52,7 +52,7 @@ leagues could be added in the future:
 
 #### Dataset Descriptions
 
-- historical match <span style = "background-color: #DEFFE4">(collected)</span>
+- historical match <mark>(collected)</mark>
     - source: Transfer Market
     - collecting method: website data scraping
     - data details:
@@ -115,7 +115,7 @@ leagues could be added in the future:
 
 <br>
 
-- players' data - match stats <span style = "background-color: #DEFFE4">(collected)</span>
+- players' data - match stats <mark>(collected)</mark>
     - source: Whoscored
     - collecting method: website data scraping
     - data details:
@@ -139,7 +139,7 @@ leagues could be added in the future:
 
 <br>
 
-- players' data - players' info <span style = "background-color: #FFE6E6">(not collected yet)</span>
+- players' data - players' info <mark>(not collected yet)</mark>
     - source: Transfer Market / Sofascore
     - collecting method: website data scraping
     - data details:
