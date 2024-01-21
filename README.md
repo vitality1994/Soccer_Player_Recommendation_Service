@@ -2,22 +2,22 @@
 
 ## Project Summaries
 
-### <center> Business Problem</center> <br>
+### <center> Why a data-driven player recommendation service is necessary?</center>
 - Nowadays, soccer players' market value contains a serious market bubble for many different reasons: inflow of oil money from the Mideast, high demand for specific players, and some special rules each league has differently, such as home-grown Quota.
-- There is a specific period that teams can sign new players: the Summer and winter transfer market. Therefore, if the target player has already signed with another team, starting negotiations with other players on the list of similar players to the previous target player is crucial.
+- There is a specific period that teams can sign new players: the Summer and Winter transfer market. Therefore, if the target player has already signed with another team, starting negotiations with other players on the list of similar players to the previous target player is crucial.
 - There are many leagues in the world, and each league contains many teams, and each team contains many players. 
 Spending time to make the list of target players is also a cost as a business aspect.
 - For the detailed analysis of the players in the list, domain experts (player scouters) need a dashboard that presents details of players.
 
 </br>
 
-### <center> Solution Strategy </center> <br>
+### <center> What are the benefits of this service? </center>
 - A recommendation system of similar players to the target players is to be ready if the negotiation breaks down.
 - The dashboard can support domain experts (player scouters) to help them build a better transfer market strategy.
 
 </br>
 
-### <center> Service Details <br>
+### <center> What services are provided by this project? <br>
 - similar player recommendations
 - dashboards of a target player & similar players
     - players’ details
@@ -27,39 +27,39 @@ Spending time to make the list of target players is also a cost as a business as
     - players’ general reputation
     - expertises’ evaluations
 - player analysis
-    - What analysis do other websites (TransferMarket, Squawka, Whoscored, Premier League Official, etc.) not offer?
-        - time series analysis of players’ statistics
-            - Why do we care about historical stats more than the most current stats of players?
-                - Players sometimes perform worse after transferring to a different team (or a different league). Analyze historical stats of players to understand what could be the factors.
-            - Historical stats are a good reference to check the general trend of players’ performance (per match, against rival teams, seasonal, etc.) 
+    - analysis other websites (TransferMarket, Squawka, Whoscored, Premier League Official, etc.) does not offer
+        - time series analysis of players’ statistics <br>
+            - Historical stats are a good reference to check the general trend of players’ performance.
 
 <br><br>
 
-### <center> Data details </center> <br>
+### <center> What data is used? </center> <br>
 
-#### Target leagues list (ordered by UEFA coefficients)
-1. Premier League (England)
-2. Laliga (Spain)
-3. Seria-A (Italy)
-4. Bundesliga (Germany)
-5. ~~Eredivisi (Netherlands)~~
-6. Ligue 1 (France)
-7. ~~Liga Portugal (Portugal)~~
-8. ~~Jupiler Pro League (Belgium)~~
-9. ~~Super Lig (Türkiye)~~
+leagues currently included in the dataset:
+- Premier League (England)
+- Laliga (Spain)
+- Seria-A (Italy)
+- Bundesliga (Germany)
+- Ligue 1 (France)
+
+leagues could be added in the future:
+- Eredivisi (Netherlands)
+- Liga Portugal (Portugal)
+- Jupiler Pro League (Belgium)
+- Super Lig (Türkiye)
 
 <br>
 
-#### Dataset descriptions
+#### Dataset Descriptions
 
-- historical match data
+- historical match <span style = "background-color: #DEFFE4">(collected)</span>
     - source: Transfer Market
     - collecting method: website data scraping
     - data details:
         - match general info
             - day of week
             - match date
-            - match start / end time
+            - match starttime
             - stadium
             - number of Attendance
             - referee
@@ -115,7 +115,31 @@ Spending time to make the list of target players is also a cost as a business as
 
 <br>
 
-- players' data (1)
+- players' data - match stats <span style = "background-color: #DEFFE4">(collected)</span>
+    - source: Whoscored
+    - collecting method: website data scraping
+    - data details:
+        - match date
+        - home team name 
+        - away team name
+        - home lineup
+            - player name
+            - position
+            - match stat 1
+            - match stat 2 
+            - ... <br>
+            *for all starting lineups + subs
+        - away lineup
+            - player name
+            - position
+            - match stat 1
+            - match stat 2 
+            - ... <br>
+            *for all starting lineups + subs
+
+<br>
+
+- players' data - players' info <span style = "background-color: #FFE6E6">(not collected yet)</span>
     - source: Transfer Market / Sofascore
     - collecting method: website data scraping
     - data details:
@@ -140,39 +164,3 @@ Spending time to make the list of target players is also a cost as a business as
             - seasonal stats (not overlapped with stats from Whoscored.com)
 
 <br>
-
-- players' data - match stats
-    - source: Whoscored
-    - collecting method: website data scraping
-    - data details:
-        - match date
-        - home team name 
-        - away team name
-        - home lineup
-            - player name
-            - position
-            - match stat 1
-            - match stat 2 
-            - ... <br>
-            *for all starting lineups + subs
-        - away lineup
-            - player name
-            - position
-            - match stat 1
-            - match stat 2 
-            - ... <br>
-            *for all starting lineups + subs
-
-
-
-<br><br>
-
-### <center> Plans </center>
-
-[plan for building Database](./plans/Plan_for_building_DB.md)
-
-collecting data
-
-build database
-
-![image](Soccer%20Player%20Recommender.png)

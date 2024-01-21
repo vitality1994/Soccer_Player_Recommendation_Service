@@ -9,6 +9,8 @@ from fake_headers import Headers
 import argparse
 from datetime import datetime
 
+import sys, os
+
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -88,7 +90,10 @@ for year_index in list(reversed(range(15)))[int(args.start_year)-2010:-1]: # cha
     driver.find_element(By.XPATH, f'//*[@id="seasons"]/option[{year_index}]').click()
 
     # Counting the number of match weeks in a given season before the current match week.----
-    last_year_num_matchweek = 0
+    num_matchweeks = 1
+
+    if args.start_matchweek == None:
+        num_matchweeks = 0
 
     for i in range(50):
 
@@ -102,15 +107,15 @@ for year_index in list(reversed(range(15)))[int(args.start_year)-2010:-1]: # cha
         if temp_current_week == new_current_week:
             break
 
-        last_year_num_matchweek += 1
+        num_matchweeks += 1
 
     # ----------------------------------------------------------------------------------------
 
     # assign the number of matchweeks after counting    
-    num_matchweeks = last_year_num_matchweek
+    num_matchweeks = num_matchweeks
 
     # if args.start_year==str(datetime.today().year):
-    #     num_matchweeks = last_year_num_matchweek+1
+    #     num_matchweeks = num_matchweeks+1
 
     # go back to the target starting year
     driver.find_element(By.XPATH, league_url).click()
@@ -152,6 +157,36 @@ for year_index in list(reversed(range(15)))[int(args.start_year)-2010:-1]: # cha
 
         else:
             print(f'matchweek {num_matchweeks-i}')
+
+
+        path = f'/Users/jooyong/github_locals/Soccer_Player_Recommendation_Service/data/player_stats(from_whoscored)/Laliga_player_stats/'
+        file_list = os.listdir(path)
+
+        year_list = []
+        for file in file_list:
+            
+            year_list.append(int(file.split('-')[0]))
+
+        latest_year = max(year_list)
+
+
+        path = f'/Users/jooyong/github_locals/Soccer_Player_Recommendation_Service/data/player_stats(from_whoscored)/Laliga_player_stats/{latest_year}-{latest_year+1}'
+        file_list = os.listdir(path)
+
+        matchweek_list = []
+        for file in file_list:
+            
+            matchweek_list.append(int(file.split('.')[0].split('matchweek_')[1]))
+
+        latest_matchweek = max(matchweek_list)
+
+        print(driver.find_element(By.XPATH, f'//*[@id="seasons"]/option[{year_index}]').text.split('/')[0], str(latest_year))
+        print(num_matchweeks-i, latest_matchweek)
+
+        if driver.find_element(By.XPATH, f'//*[@id="seasons"]/option[{year_index}]').text.split('/')[0]==str(latest_year) and num_matchweeks-i == latest_matchweek:
+            print('done!')
+            sys.exit()
+
 
         time.sleep(5)
 

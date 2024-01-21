@@ -9,6 +9,8 @@ from fake_headers import Headers
 import argparse
 from datetime import datetime
 
+import sys, os
+
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -40,7 +42,7 @@ driver.get(website)
 
 
 #league urls
-league_urls_num_matchweeks = {'//*[@id="popular-tournaments-list"]/li[4]/a': 34} # Bundesliga (Germany)
+league_urls_num_matchweeks = {'//*[@id="popular-tournaments-list"]/li[2]/a': 38} # Seria_A (Italy)
 
 league_url = list(league_urls_num_matchweeks.keys())[0]
 num_matchweeks = list(league_urls_num_matchweeks.values())[0]
@@ -49,7 +51,7 @@ num_matchweeks = list(league_urls_num_matchweeks.values())[0]
 # arguments setting -----------------------------------------------------------
 parser = argparse.ArgumentParser()
 parser.add_argument('--start_year', required=True)
-parser.add_argument('--start_matchweek', required=False, default=num_matchweeks)
+parser.add_argument('--start_matchweek', required=False, default=None)
 args = parser.parse_args()
 # -----------------------------------------------------------------------------
 
@@ -88,8 +90,16 @@ for year_index in list(reversed(range(15)))[int(args.start_year)-2010:-1]: # cha
     print(driver.find_element(By.XPATH, f'//*[@id="seasons"]/option[{year_index}]').text)
     driver.find_element(By.XPATH, f'//*[@id="seasons"]/option[{year_index}]').click()
 
+    try:
+        driver.find_element(By.XPATH, f'/html/body/div[4]/div[3]/div[1]/div[1]/span[7]/select/option[1]').click()
+    except:
+        pass
+
+    num_matchweeks = 1
     # Counting the number of match weeks in a given season before the current match week.----
-    last_year_num_matchweek = 0
+    
+    if args.start_matchweek == None:
+        num_matchweeks = 0
 
     for i in range(50):
 
@@ -98,30 +108,33 @@ for year_index in list(reversed(range(15)))[int(args.start_year)-2010:-1]: # cha
         time.sleep(1)
         driver.find_element(By.XPATH, '//*[@id="date-controller"]/a[1]').click()
 
-        last_year_num_matchweek += 1
+        
 
         new_current_week = driver.find_element(By.XPATH, '/html/body/div[4]/div[3]/div[1]/div[5]/div/div/a[2]/span[1]').text
 
         if temp_current_week == new_current_week:
             break
-
         
-
+        num_matchweeks += 1
     # ----------------------------------------------------------------------------------------
 
     # assign the number of matchweeks after counting    
-    num_matchweeks = last_year_num_matchweek
+    num_matchweeks = num_matchweeks
 
     # if args.start_year==str(datetime.today().year):
-    #     num_matchweeks = last_year_num_matchweek+1
+    #     num_matchweeks = num_matchweeks+1
 
     # go back to the target starting year
     driver.find_element(By.XPATH, league_url).click()
     driver.find_element(By.XPATH, f'//*[@id="seasons"]/option[{year_index}]').click()
 
+    try:
+        driver.find_element(By.XPATH, f'/html/body/div[4]/div[3]/div[1]/div[1]/span[7]/select/option[1]').click()
+    except:
+        pass
 
     # set starting point of the matchweek
-    if is_begin == 1:
+    if is_begin == 1 and args.start_matchweek!=None:
         starting_point = int(args.start_matchweek)
 
     else:
@@ -131,6 +144,10 @@ for year_index in list(reversed(range(15)))[int(args.start_year)-2010:-1]: # cha
         for j in range(num_matchweeks-starting_point):
             time.sleep(1)
             driver.find_element(By.XPATH, '//*[@id="date-controller"]/a[1]').click()
+
+    elif args.start_matchweek==None:
+        time.sleep(1)
+        driver.find_element(By.XPATH, '//*[@id="date-controller"]/a[1]').click()
 
     is_begin = 0
 
@@ -149,6 +166,36 @@ for year_index in list(reversed(range(15)))[int(args.start_year)-2010:-1]: # cha
 
         else:
             print(f'matchweek {num_matchweeks-i}')
+
+
+        path = f'/Users/jooyong/github_locals/Soccer_Player_Recommendation_Service/data/player_stats(from_whoscored)/Serie_A_player_stats/'
+        file_list = os.listdir(path)
+
+        year_list = []
+        for file in file_list:
+            
+            year_list.append(int(file.split('-')[0]))
+
+        latest_year = max(year_list)
+
+
+        path = f'/Users/jooyong/github_locals/Soccer_Player_Recommendation_Service/data/player_stats(from_whoscored)/Serie_A_player_stats/{latest_year}-{latest_year+1}'
+        file_list = os.listdir(path)
+
+        matchweek_list = []
+        for file in file_list:
+            
+            matchweek_list.append(int(file.split('.')[0].split('matchweek_')[1]))
+
+        latest_matchweek = max(matchweek_list)
+
+        print(driver.find_element(By.XPATH, f'//*[@id="seasons"]/option[{year_index}]').text.split('/')[0], str(latest_year))
+        print(num_matchweeks-i, latest_matchweek)
+
+        if driver.find_element(By.XPATH, f'//*[@id="seasons"]/option[{year_index}]').text.split('/')[0]==str(latest_year) and num_matchweeks-i == latest_matchweek:
+            print('done!')
+            sys.exit()
+
 
         time.sleep(5)
 
@@ -176,7 +223,7 @@ for year_index in list(reversed(range(15)))[int(args.start_year)-2010:-1]: # cha
 
                 print(match_date, home_name, 'vs', away_name)
 
-
+                
                 #%% for loop: to get player stat summary ----------------------------------
                 stats_columns = ['Name', 'Position', 'Shots', 'ShotsOT', 'KeyPasses',
                                 'PA%', 'AerialsWon', 'Touches', 'Rating']
@@ -612,6 +659,9 @@ for year_index in list(reversed(range(15)))[int(args.start_year)-2010:-1]: # cha
 
                     #     driver.find_element(By.XPATH, '//*[@id="date-controller"]/a[1]').click()
 
+                    if args.start_matchweek==None:
+                        driver.find_element(By.XPATH, '//*[@id="date-controller"]/a[1]').click()
+
                     for j in range(i+1):
                         time.sleep(1)
                         driver.find_element(By.XPATH, '//*[@id="date-controller"]/a[1]').click()
@@ -621,9 +671,8 @@ for year_index in list(reversed(range(15)))[int(args.start_year)-2010:-1]: # cha
 
                 else:
                     
-                    # if args.start_year==str(datetime.today().year):
-
-                    #     driver.find_element(By.XPATH, '//*[@id="date-controller"]/a[1]').click()
+                    if args.start_matchweek==None:
+                        driver.find_element(By.XPATH, '//*[@id="date-controller"]/a[1]').click()
 
                     for j in range(i):
                         time.sleep(1)
